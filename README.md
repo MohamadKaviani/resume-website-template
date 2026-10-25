@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>&lt;ResumeTemplate /&gt;</h1>
+<h1><img src="assets/images/readme-title.svg" alt="ResumeTemplate" width="560"></h1>
 
 <p><b>A sleek, dark-first, bilingual resume website.</b><br>
 Persian (RTL) + English (LTR). Zero frameworks. Zero CDN.</p>
@@ -82,6 +82,6 @@ Released under the [MIT License](LICENSE). Free to use, modify and share.
 
 <div align="center">
 
-<sub>Built with 💚 and lime-green accents.</sub>
+<a href="https://github.com/MohamadKaviani"><img src="https://img.shields.io/badge/Built_with_%F0%9F%92%9A_by-MohamadKaviani-84cc16?style=for-the-badge&labelColor=18181b" alt="Built with love by MohamadKaviani"></a>
 
 </div>
