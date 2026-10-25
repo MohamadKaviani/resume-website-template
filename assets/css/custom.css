@@ -1,0 +1,351 @@
+body {
+    font-family: 'Vazirmatn', sans-serif;
+}
+    @font-face {
+        font-family: 'Vazirmatn';
+        src: url('../fonts/Vazirmatn.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    /* ====== انیمیشن ساده ورود عناصر هنگام اسکرول (Reveal on Scroll) ====== */
+    .reveal {
+        opacity: 0;
+        transform: translateY(48px) scale(0.97);
+        transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .reveal-delay-1 {
+        transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+        transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+        transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+        transition-delay: 0.4s;
+    }
+
+    /* نوار سطح تسلط مهارت‌ها */
+    .skill-bar {
+        transition: width 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+    }
+
+    /* احترام به تنظیمات کاربرانی که کاهش حرکت را ترجیح می‌دهند */
+    @media (prefers-reduced-motion: reduce) {
+        .reveal {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+    }
+
+    /* ====== افکت تغییر نرم بین Dark/Light Mode (Circular Reveal) ====== */
+    /* مختصات و شعاع کلیک روی دکمه تم، برای مرکز و اندازه دایره افکت استفاده می‌شود */
+    :root {
+        --theme-toggle-x: 50%;
+        --theme-toggle-y: 50%;
+        --theme-toggle-r: 150%;
+    }
+
+    /* پس‌زمینه صریح روی خود html (نه فقط body)، تا لحظه Capture شدن
+           Snapshot توسط View Transitions API هیچ سفیدی/شکاف پیش‌فرض مرورگر دیده نشود */
+    html {
+        background-color: #ffffff;
+        color-scheme: light;
+    }
+
+    html.dark {
+        background-color: #09090b;
+        color-scheme: dark;
+    }
+
+    @supports (view-transition-name: root) {
+
+        /* غیرفعال‌سازی کامل انیمیشن/ترنسفورم پیش‌فرض مرورگر روی گروه و
+               لایه‌های Snapshot؛ همین رفتار پیش‌فرض (fade + جابه‌جایی احتمالی)
+               عامل اصلی حس Flash/پرش هنگام تغییر تم بود */
+        ::view-transition-group(root),
+        ::view-transition-image-pair(root),
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+            mix-blend-mode: normal;
+            transform: none;
+        }
+
+        ::view-transition-old(root) {
+            z-index: 1;
+        }
+
+        ::view-transition-new(root) {
+            z-index: 2;
+        }
+
+        .theme-reveal::view-transition-old(root) {
+            animation: none;
+        }
+
+        .theme-reveal::view-transition-new(root) {
+            animation: theme-circle-reveal 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            clip-path: circle(0px at var(--theme-toggle-x) var(--theme-toggle-y));
+            will-change: clip-path;
+        }
+
+        @keyframes theme-circle-reveal {
+            from {
+                clip-path: circle(0px at var(--theme-toggle-x) var(--theme-toggle-y));
+            }
+
+            to {
+                clip-path: circle(var(--theme-toggle-r) at var(--theme-toggle-x) var(--theme-toggle-y));
+            }
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .theme-reveal::view-transition-new(root),
+        .theme-reveal::view-transition-old(root) {
+            animation: none !important;
+        }
+    }
+
+    /* ====== مرحله ۱: افکت Glitch / پارازیت دیجیتال پیش از تغییر Theme ====== */
+    /* لایه اورلی تمام‌صفحه، بدون تاثیر روی Layout (position: fixed + pointer-events: none) */
+    #theme-glitch-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        mix-blend-mode: difference;
+        background: repeating-linear-gradient(to bottom,
+                rgba(163, 230, 53, 0.05) 0px,
+                rgba(163, 230, 53, 0.05) 1px,
+                transparent 1px,
+                transparent 3px);
+    }
+
+    /* دو لایه شکست رنگ (Chromatic Aberration) شبیه‌سازی‌شده با کلیپ‌های افقی */
+    #theme-glitch-overlay::before,
+    #theme-glitch-overlay::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        mix-blend-mode: screen;
+    }
+
+    #theme-glitch-overlay::before {
+        background: rgba(56, 189, 248, 0.4);
+    }
+
+    #theme-glitch-overlay::after {
+        background: rgba(244, 63, 94, 0.32);
+    }
+
+    html.theme-glitching #theme-glitch-overlay {
+        animation: glitch-scanlines 0.18s steps(3, end) forwards;
+        will-change: opacity;
+    }
+
+    html.theme-glitching #theme-glitch-overlay::before {
+        animation: glitch-slice-a 0.18s steps(5, end) forwards;
+        will-change: opacity, transform, clip-path;
+    }
+
+    html.theme-glitching #theme-glitch-overlay::after {
+        animation: glitch-slice-b 0.18s steps(5, end) forwards;
+        will-change: opacity, transform, clip-path;
+    }
+
+    /* لرزش بسیار ظریف کل صفحه (فقط Transform، بدون تاثیر روی Layout) */
+    html.theme-glitching body {
+        animation: glitch-jitter 0.18s steps(6, end);
+    }
+
+    @keyframes glitch-scanlines {
+        0% {
+            opacity: 0;
+        }
+
+        20% {
+            opacity: .5;
+        }
+
+        35% {
+            opacity: .08;
+        }
+
+        55% {
+            opacity: .4;
+        }
+
+        75% {
+            opacity: .06;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes glitch-slice-a {
+        0% {
+            opacity: 0;
+            clip-path: inset(15% 0 70% 0);
+            transform: translateX(0);
+        }
+
+        20% {
+            opacity: .7;
+            clip-path: inset(40% 0 30% 0);
+            transform: translateX(-6px);
+        }
+
+        40% {
+            opacity: .3;
+            clip-path: inset(5% 0 80% 0);
+            transform: translateX(4px);
+        }
+
+        60% {
+            opacity: .6;
+            clip-path: inset(60% 0 10% 0);
+            transform: translateX(-3px);
+        }
+
+        80% {
+            opacity: .2;
+            clip-path: inset(25% 0 55% 0);
+            transform: translateX(2px);
+        }
+
+        100% {
+            opacity: 0;
+            clip-path: inset(0 0 100% 0);
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes glitch-slice-b {
+        0% {
+            opacity: 0;
+            clip-path: inset(65% 0 10% 0);
+            transform: translateX(0);
+        }
+
+        20% {
+            opacity: .6;
+            clip-path: inset(10% 0 60% 0);
+            transform: translateX(6px);
+        }
+
+        40% {
+            opacity: .25;
+            clip-path: inset(75% 0 5% 0);
+            transform: translateX(-4px);
+        }
+
+        60% {
+            opacity: .55;
+            clip-path: inset(20% 0 50% 0);
+            transform: translateX(3px);
+        }
+
+        80% {
+            opacity: .15;
+            clip-path: inset(45% 0 30% 0);
+            transform: translateX(-2px);
+        }
+
+        100% {
+            opacity: 0;
+            clip-path: inset(100% 0 0 0);
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes glitch-jitter {
+
+        0%,
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+
+        16% {
+            transform: translate3d(-1px, 0, 0);
+        }
+
+        33% {
+            transform: translate3d(1px, 0, 0);
+        }
+
+        50% {
+            transform: translate3d(-1px, 1px, 0);
+        }
+
+        66% {
+            transform: translate3d(1px, -1px, 0);
+        }
+
+        83% {
+            transform: translate3d(0, 1px, 0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        html.theme-glitching #theme-glitch-overlay,
+        html.theme-glitching #theme-glitch-overlay::before,
+        html.theme-glitching #theme-glitch-overlay::after,
+        html.theme-glitching body {
+            animation: none !important;
+        }
+    }
+
+    /* ====== اسکرول نرم (Lenis) — استایل‌های پایه کتابخانه ====== */
+    html.lenis,
+    html.lenis body {
+        height: auto;
+    }
+
+    .lenis:not(.lenis-autoToggle).lenis-stopped {
+        overflow: clip;
+    }
+
+    .lenis [data-lenis-prevent],
+    .lenis [data-lenis-prevent-wheel],
+    .lenis [data-lenis-prevent-touch] {
+        overscroll-behavior: contain;
+    }
+
+    .lenis.lenis-smooth iframe {
+        pointer-events: none;
+    }
+
+    /* لایه‌های Hero که هنگام اسکرول Parallax می‌شوند */
+    #hero-content,
+    #hero-code-canvas {
+        will-change: transform, opacity;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        #hero-content,
+        #hero-code-canvas {
+            will-change: auto;
+        }
+    }
